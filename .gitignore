@@ -1,0 +1,29 @@
+# ---- Python (backend) ----
+__pycache__/
+*.pyc
+*.pyo
+# local runtime state / db / logs
+*.db
+*.db-journal
+smart-dustbin/dustbin_state.json
+smart-dustbin/dustbin_state.tmp
+*.log
+
+# ---- Node / Next.js (dashboard) ----
+node_modules/
+.next/
+out/
+build/
+.vercel/
+*.tsbuildinfo
+
+# ---- env / secrets ----
+.env
+.env.*
+
+# ---- OS / editor ----
+.DS_Store
+Thumbs.db
+
+# ---- archives (generated, not source) ----
+sample-data.zip

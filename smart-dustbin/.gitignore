@@ -1,0 +1,6 @@
+__pycache__/
+*.pyc
+# runtime state — not source
+dustbin_state.json
+dustbin_state.tmp
+*.log

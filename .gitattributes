@@ -1,0 +1,12 @@
+# Normalize text line endings in the repo (LF), check out native on each OS.
+* text=auto
+
+# Treat these as binary so git never line-ending-converts (or diffs) them.
+*.pdf binary
+*.zip binary
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.ico binary
+*.woff binary
+*.woff2 binary

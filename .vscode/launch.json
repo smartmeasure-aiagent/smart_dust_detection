@@ -1,0 +1,13 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Smart Dustbin server (FastAPI)",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/smart-dustbin/app.py",
+      "cwd": "${workspaceFolder}/smart-dustbin",
+      "console": "integratedTerminal"
+    }
+  ]
+}

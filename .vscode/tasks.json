@@ -1,0 +1,57 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Start all (API + UI)",
+      "dependsOn": ["API server (FastAPI :5000)", "Dashboard UI (Next.js dev :3000)"],
+      "dependsOrder": "parallel",
+      "problemMatcher": [],
+      "runOptions": { "runOn": "folderOpen" }
+    },
+    {
+      "label": "API server (FastAPI :5000)",
+      "type": "shell",
+      "command": "python",
+      "args": ["-m", "uvicorn", "app:app", "--host", "0.0.0.0", "--port", "5000", "--reload"],
+      "options": { "cwd": "${workspaceFolder}/smart-dustbin" },
+      "isBackground": true,
+      "problemMatcher": [],
+      "presentation": { "reveal": "always", "panel": "dedicated", "group": "services" }
+    },
+    {
+      "label": "Dashboard UI (Next.js dev :3000)",
+      "type": "shell",
+      "command": "npm",
+      "args": ["run", "dev"],
+      "options": { "cwd": "${workspaceFolder}/dashboard" },
+      "isBackground": true,
+      "problemMatcher": [],
+      "presentation": { "reveal": "always", "panel": "dedicated", "group": "services" }
+    },
+    {
+      "label": "Build dashboard (served by API at :5000)",
+      "type": "shell",
+      "command": "npm",
+      "args": ["run", "build"],
+      "options": { "cwd": "${workspaceFolder}/dashboard" },
+      "problemMatcher": [],
+      "group": "build"
+    },
+    {
+      "label": "Test API",
+      "type": "shell",
+      "command": "python",
+      "args": ["test_app.py"],
+      "options": { "cwd": "${workspaceFolder}/smart-dustbin" },
+      "problemMatcher": [],
+      "group": "test"
+    },
+    {
+      "label": "Upload ESP32 firmware (COM3)",
+      "type": "shell",
+      "command": "& \"$env:LOCALAPPDATA\Programs\Arduino IDE\resources\app\lib\backend\resources\arduino-cli.exe\" compile --fqbn esp32:esp32:esp32 -u -p COM3 smart_dustbin_esp32",
+      "options": { "cwd": "${workspaceFolder}", "shell": { "executable": "powershell.exe", "args": ["-NoProfile", "-Command"] } },
+      "problemMatcher": []
+    }
+  ]
+}
