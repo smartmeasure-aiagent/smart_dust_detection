@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import BinGauge from "@/components/BinGauge";
 import DevicePanel from "@/components/DevicePanel";
 import HistoryChart from "@/components/HistoryChart";
+import { api } from "@/lib/api";
 import { notificationPermission, raiseAlert, requestNotifications } from "@/lib/alerts";
 import { BinStatus, Level, Point, Stats, STALE_AFTER_S, formatDuration, formatTime, levelColor, levelFor } from "@/lib/types";
 
@@ -51,9 +52,9 @@ export default function Dashboard() {
   const refresh = useCallback(async () => {
     try {
       const [s, h, st] = await Promise.all([
-        fetch("/api/status", { cache: "no-store" }).then((r) => r.json() as Promise<BinStatus>),
-        fetch("/api/history", { cache: "no-store" }).then((r) => r.json() as Promise<Point[]>),
-        fetch("/api/stats", { cache: "no-store" }).then((r) => r.json() as Promise<Stats>).catch(() => null),
+        fetch(api("/api/status"), { cache: "no-store" }).then((r) => r.json() as Promise<BinStatus>),
+        fetch(api("/api/history"), { cache: "no-store" }).then((r) => r.json() as Promise<Point[]>),
+        fetch(api("/api/stats"), { cache: "no-store" }).then((r) => r.json() as Promise<Stats>).catch(() => null),
       ]);
       setData(s);
       setPoints(h);
@@ -187,7 +188,7 @@ export default function Dashboard() {
               </button>
               <button
                 onClick={async () => {
-                  await fetch("/api/reset", { method: "POST" });
+                  await fetch(api("/api/reset"), { method: "POST" });
                   wasFull.current = false;
                   refresh();
                 }}
