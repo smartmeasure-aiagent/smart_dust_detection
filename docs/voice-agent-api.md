@@ -38,8 +38,54 @@ CORS is open (`*`) so the agent service — and browser-based function-test cons
 
 ## Endpoints
 
+### `GET /api/voice/stream` — live feed (Server-Sent Events)
+Continuous push stream for the voice agent, so it doesn't have to poll. `Content-Type:
+text/event-stream`. Query params: `interval` (seconds between pushes, default 2, clamped 1–30)
+and optional `bin_id`.
+
+Event frames:
+- `status` — every `interval` seconds, the full `/api/voice/status` payload (incl. `speech`).
+- `alert` — fired **once** the moment the bin crosses into "needs collection".
+- `device` — fired when the bin goes offline/online or the sensor faults/recovers.
+
+```
+: connected
+
+event: status
+data: {"bin_id":"BIN-A1","fill_percent":45,...,"speech":"Bin A1 is 45 percent full and available."}
+
+event: alert
+data: {"bin_id":"BIN-A1","fill_percent":88,"needs_collection":true,...,"speech":"Bin A1 is 88 percent full and needs to be collected now."}
+```
+
+Consume it with any SSE client (it auto-reconnects):
+
+```bash
+curl -N -H "x-api-key: your-secret" "http://<server-ip>:5000/api/voice/stream?interval=2"
+```
+```js
+// browser / Node (EventSource)
+const es = new EventSource("/api/voice/stream?interval=2");
+es.addEventListener("status", (e) => speak(JSON.parse(e.data).speech));
+es.addEventListener("alert",  (e) => startCall(JSON.parse(e.data)));
+```
+```python
+# Python (httpx) — stream and act on each event
+import httpx, json
+with httpx.stream("GET", "http://localhost:5000/api/voice/stream",
+                  headers={"x-api-key": "your-secret"}) as r:
+    for line in r.iter_lines():
+        if line.startswith("data:"):
+            evt = json.loads(line[5:]); print(evt["speech"])
+```
+
+> EventSource can't set headers, so for browser use either leave `API_KEY` unset or put the key in a
+> query string behind your own proxy. Server-to-server clients (the usual voice-agent case) send the
+> `x-api-key` / `Authorization` header normally.
+
 ### `GET /api/voice/status`
-Current fill level of the bin. Optional query param `bin_id`.
+Current fill level of the bin — a one-shot snapshot (use the stream above for a continuous feed).
+Optional query param `bin_id`.
 
 ```json
 {

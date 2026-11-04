@@ -115,6 +115,8 @@ class ApiKeyTest(unittest.TestCase):
         self.assertEqual(self.c.get('/api/voice/status', headers={'x-api-key': 'secret'}).status_code, 200)
         self.assertEqual(
             self.c.get('/api/voice/status', headers={'Authorization': 'Bearer secret'}).status_code, 200)
+        # the stream endpoint is guarded too (401 returns before streaming starts)
+        self.assertEqual(self.c.get('/api/voice/stream').status_code, 401)
         # dashboard data stays open regardless of the key
         self.assertEqual(self.c.get('/api/status').status_code, 200)
 

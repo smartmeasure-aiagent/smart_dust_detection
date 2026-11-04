@@ -1,3 +1,4 @@
+import asyncio
 import json
 import os
 import time
@@ -6,18 +7,34 @@ from datetime import datetime
 from pathlib import Path
 
 import uvicorn
-from fastapi import Depends, FastAPI, Header, HTTPException
+from fastapi import Depends, FastAPI, Header, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import HTMLResponse, JSONResponse
+from fastapi.responses import HTMLResponse, JSONResponse, StreamingResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 
 # Built Next.js dashboard (cd dashboard && npm run build)
 UI_DIR = Path(__file__).resolve().parent.parent / "dashboard" / "out"
 
+def _load_dotenv():
+    """Load KEY=VALUE lines from a sibling .env file (no dependency). Real
+    environment variables still win. Create `.env` from `.env.example`."""
+    envf = Path(__file__).resolve().parent / ".env"
+    if not envf.exists():
+        return
+    for line in envf.read_text().splitlines():
+        line = line.strip()
+        if not line or line.startswith("#") or "=" not in line:
+            continue
+        key, val = line.split("=", 1)
+        os.environ.setdefault(key.strip(), val.strip().strip('"').strip("'"))
+
+
+_load_dotenv()
+
 # Single API key for programmatic API access (the voice-call agent / external services).
-# Set API_KEY in the environment to require it; leave unset to allow open access
-# (fine for local prototype testing). The browser dashboard does not use it.
+# Set it in `.env` (API_KEY=...) or the environment to require it; leave blank/unset to
+# allow open access (fine for local prototype testing). The browser dashboard does not use it.
 API_KEY = os.environ.get("API_KEY")
 
 app = FastAPI(title="Smart Dustbin API")
@@ -434,6 +451,50 @@ def voice_query(q: VoiceQuery):
     data = _bin_payload(q.bin_id)
     return {"intent": intent, "speech": data["speech"], "data": data,
             "note": "unrecognised intent; returned current bin status"}
+
+
+def _sse(event, payload):
+    """Format one Server-Sent Event frame."""
+    return f"event: {event}\ndata: {json.dumps(payload)}\n\n"
+
+
+@app.get('/api/voice/stream', dependencies=[Depends(require_api_key)])
+async def voice_stream(request: Request, interval: float = 2.0, bin_id: str | None = None):
+    """Continuous live feed for the voice-call agent (Server-Sent Events).
+
+    Pushes a `status` event (the full voice payload, incl. `speech`) every
+    `interval` seconds, a one-off `alert` event the moment the bin needs
+    collection, and a `device` event when it goes offline or the sensor faults.
+    Consume with an EventSource / any SSE client; it reconnects on its own.
+    """
+    interval = max(1.0, min(interval, 30.0))
+
+    async def gen():
+        prev_needs = None
+        prev_online = None
+        prev_sensor = None
+        yield ": connected\n\n"  # open the stream immediately
+        while True:
+            if await request.is_disconnected():
+                break
+            payload = _bin_payload(bin_id)
+            yield _sse("status", payload)
+            # edge-triggered events so the agent can react, not just observe
+            if payload["needs_collection"] and prev_needs is False:
+                yield _sse("alert", payload)
+            if prev_online is not None and payload["online"] != prev_online:
+                yield _sse("device", payload)
+            elif prev_sensor is not None and payload["sensor_ok"] != prev_sensor:
+                yield _sse("device", payload)
+            prev_needs, prev_online, prev_sensor = (
+                payload["needs_collection"], payload["online"], payload["sensor_ok"])
+            await asyncio.sleep(interval)
+
+    return StreamingResponse(gen(), media_type="text/event-stream", headers={
+        "Cache-Control": "no-cache",
+        "Connection": "keep-alive",
+        "X-Accel-Buffering": "no",  # disable proxy buffering so events flush live
+    })
 
 
 # Restore persisted history/events on startup (works for both `python app.py`

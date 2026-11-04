@@ -106,12 +106,12 @@ export default function Dashboard() {
     <main className="mx-auto max-w-6xl px-4 py-7 sm:px-6 sm:py-12">
       <header className="rise-in mb-7 flex flex-wrap items-center justify-between gap-4">
         <div className="flex items-center gap-3.5">
-          <LogoMark level={hasReading ? level : "idle"} />
+          <LogoMark />
           <div>
             <h1 className="font-display text-2xl font-extrabold leading-none tracking-tight sm:text-[2rem]">
               <span className="gradient-text text-glow">Smart Dustbin</span>
             </h1>
-            <p className="mt-1.5 text-sm text-ink-2">ESP32 · AJ-SR04M ultrasonic fill-level monitor</p>
+            <p className="mt-1.5 text-sm text-ink-2">Alert System · ESP32 ultrasonic fill-level monitor</p>
           </div>
         </div>
         <LinkBadge link={link} age={data?.age ?? null} />
@@ -343,20 +343,15 @@ function Band({ color, text }: { color: string; text: string }) {
   );
 }
 
-function LogoMark({ level }: { level: Level }) {
-  const c = levelColor[level];
+function LogoMark() {
+  // eslint-disable-next-line @next/next/no-img-element
   return (
-    <span
-      className="relative flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl"
-      style={{ background: "linear-gradient(135deg, var(--brand), var(--brand-2))", boxShadow: "0 12px 26px -12px var(--glow)" }}
-    >
-      <svg viewBox="0 0 24 24" className="h-6 w-6" fill="none" stroke="#04120c" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M4 7h16" />
-        <path d="M6 7l1 13a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1l1-13" />
-        <path d="M9 7V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2" />
-      </svg>
-      <span className="absolute -right-0.5 -top-0.5 h-3 w-3 rounded-full border-2 border-[color:var(--page-1)]" style={{ background: c }} />
-    </span>
+    <img
+      src="/logo-icon.png"
+      alt="Smart Dustbin Alert System"
+      className="h-14 w-14 shrink-0 object-contain sm:h-16 sm:w-16"
+      style={{ filter: "drop-shadow(0 8px 18px var(--glow))" }}
+    />
   );
 }
 

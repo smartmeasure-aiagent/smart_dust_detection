@@ -8,8 +8,9 @@ const sora = Sora({ variable: "--font-sora", subsets: ["latin"] });
 const jb = JetBrains_Mono({ variable: "--font-jb", subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Smart Dustbin",
+  title: "Smart Dustbin Alert System",
   description: "Live fill-level monitoring for the ESP32 smart dustbin prototype",
+  icons: { icon: "/logo-icon.png", shortcut: "/favicon.ico" },
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
