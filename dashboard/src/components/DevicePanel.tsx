@@ -88,7 +88,7 @@ export default function DevicePanel({ data, serverUp }: { data: BinStatus | null
   );
 
   return (
-    <section className="topline rise-in glass mt-5 rounded-3xl p-5" style={{ animationDelay: "0.3s" }}>
+    <section className="topline rise-in glass h-full rounded-3xl p-5" style={{ animationDelay: "0.3s" }}>
       <h2 className="text-xs font-semibold uppercase tracking-wider text-muted">Data pipeline</h2>
       <p className="mt-0.5 text-xs text-muted">Sensor → ESP32 → Wi-Fi → API → dashboard · heartbeat every 10 s</p>
       <ol className="mt-4 grid gap-3 md:grid-cols-2">

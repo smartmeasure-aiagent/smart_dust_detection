@@ -5,7 +5,7 @@
 
 const char* ssid = "Excitel_SVR_4TH Floor_2.4g";
 const char* password = "9888534443";
-const char* serverBase = "http://192.168.1.40:5000";  // PC running smart-dustbin/app.py
+const char* serverBase = "http://192.168.1.59:5000";  // PC running smart-dustbin/app.py
 const char* DEVICE_ID = "bin-01";
 const char* FW_VERSION = "1.2.1";
 

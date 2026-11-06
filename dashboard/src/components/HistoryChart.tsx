@@ -105,8 +105,8 @@ export default function HistoryChart({ points }: { points: Point[] }) {
             {formatTime(t)}
           </text>
         ))}
-        <path d={area} fill="url(#area-grad)" />
-        <path d={path} fill="none" stroke="var(--series)" strokeWidth="2.4" strokeLinejoin="round" strokeLinecap="round" filter="url(#line-glow)" />
+        <path className="chart-area" d={area} fill="url(#area-grad)" />
+        <path className="chart-line" pathLength={1} d={path} fill="none" stroke="var(--series)" strokeWidth="2.4" strokeLinejoin="round" strokeLinecap="round" filter="url(#line-glow)" />
         {active && <line x1={x(active.ts)} x2={x(active.ts)} y1={PAD.t} y2={H - PAD.b} stroke="var(--muted)" strokeWidth="1" />}
         {(active ? [active] : [last]).map((p) => (
           <circle key={p.ts} cx={x(p.ts)} cy={y(p.fill)} r="5" fill="var(--series)" stroke="var(--surface)" strokeWidth="2" />
@@ -119,7 +119,7 @@ export default function HistoryChart({ points }: { points: Point[] }) {
       </svg>
       {active && (
         <div
-          className="pointer-events-none absolute top-2 rounded-md border border-line bg-surface px-3 py-2 text-xs shadow-lg"
+          className="chart-tip pointer-events-none absolute top-2 rounded-md border border-line bg-surface px-3 py-2 text-xs shadow-lg"
           style={{ left: Math.min(Math.max(x(active.ts) / w, 0.12), 0.82) * 100 + "%", transform: "translateX(-50%)" }}
         >
           <div className="text-muted">{formatTime(active.ts)}</div>

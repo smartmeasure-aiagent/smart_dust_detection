@@ -45,7 +45,7 @@
 }
 
 @media (prefers-color-scheme: dark) {
-  :root {
+  :root:not([data-theme="light"]) {
     --page: #050a10;
     --page-1: #07131a;
     --page-2: #0a1020;
@@ -81,6 +81,44 @@
     --aurora-3: rgba(163, 230, 53, 0.18);
     --particle: rgba(52, 211, 153, 0.55);
   }
+}
+
+/* manual dark override (theme switch sets data-theme="dark") */
+:root[data-theme="dark"] {
+  --page: #050a10;
+  --page-1: #07131a;
+  --page-2: #0a1020;
+  --page-3: #0a1612;
+
+  --surface: rgba(255, 255, 255, 0.045);
+  --surface-2: rgba(255, 255, 255, 0.07);
+  --surface-solid: #0d1620;
+  --border: rgba(255, 255, 255, 0.085);
+  --glass-border: rgba(255, 255, 255, 0.12);
+
+  --ink: #e9f3ee;
+  --ink-2: #a7b7b0;
+  --muted: #6d7f77;
+
+  --grid: rgba(255, 255, 255, 0.06);
+  --axis: rgba(255, 255, 255, 0.16);
+
+  --series: #2dd4bf;
+  --brand: #34d399;
+  --brand-2: #22d3ee;
+  --accent: #a3e635;
+
+  --good: #22c55e;
+  --warning: #fbbf24;
+  --critical: #fb7185;
+
+  --track: rgba(255, 255, 255, 0.05);
+  --glow: rgba(52, 211, 153, 0.45);
+
+  --aurora-1: rgba(16, 185, 129, 0.34);
+  --aurora-2: rgba(34, 211, 238, 0.26);
+  --aurora-3: rgba(163, 230, 53, 0.18);
+  --particle: rgba(52, 211, 153, 0.55);
 }
 
 @theme inline {
@@ -163,12 +201,13 @@ body {
 }
 
 .card-hover {
-  transition: transform 0.35s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.35s, border-color 0.35s;
+  transition: transform 0.3s cubic-bezier(0.22, 0.8, 0.26, 1), box-shadow 0.3s, border-color 0.3s, background 0.3s;
 }
 .card-hover:hover {
-  transform: translateY(-3px);
-  border-color: color-mix(in srgb, var(--brand) 45%, var(--border));
-  box-shadow: 0 1px 0 0 var(--glass-border) inset, 0 28px 60px -32px var(--glow);
+  transform: translateY(-2px);
+  border-color: color-mix(in srgb, var(--brand) 32%, var(--border));
+  background: var(--surface-2);
+  box-shadow: 0 1px 0 0 var(--glass-border) inset, 0 18px 40px -30px rgba(0, 0, 0, 0.5);
 }
 
 /* ---------------- text ---------------- */
@@ -188,9 +227,10 @@ body {
   padding: 0.55rem 1rem;
   font-size: 0.875rem;
   font-weight: 600;
-  transition: transform 0.2s, box-shadow 0.25s, background 0.25s, border-color 0.25s, color 0.2s;
+  transition: transform 0.18s cubic-bezier(0.22, 0.8, 0.26, 1), box-shadow 0.25s, background 0.25s, border-color 0.25s, color 0.18s;
 }
-.btn:active { transform: translateY(1px) scale(0.99); }
+.btn:hover { transform: scale(1.02); }
+.btn:active { transform: scale(0.97); }
 .btn-primary {
   color: #04120c;
   background: linear-gradient(135deg, var(--brand), var(--brand-2));
@@ -221,10 +261,10 @@ body {
 }
 
 @keyframes rise-in {
-  from { opacity: 0; transform: translateY(14px); }
-  to { opacity: 1; transform: translateY(0); }
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
-.rise-in { animation: rise-in 0.65s cubic-bezier(0.2, 0.8, 0.2, 1) both; }
+.rise-in { animation: rise-in 0.4s ease both; }
 
 @keyframes dot-live {
   0%, 100% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--good) 60%, transparent); }
@@ -272,7 +312,302 @@ body {
 }
 .bubble { animation: bubble-up 3.4s ease-in infinite; transform-box: fill-box; }
 
+/* ---------------- app shell ---------------- */
+.app-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+}
+@media (min-width: 1024px) {
+  .app-grid {
+    grid-template-columns: var(--rail, 15.5rem) 1fr;
+    transition: grid-template-columns 0.28s cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+}
+
+/* sticky command bar + bottom status bar glass */
+.chrome {
+  background: color-mix(in srgb, var(--surface-solid) 62%, transparent);
+  backdrop-filter: blur(18px) saturate(1.4);
+  -webkit-backdrop-filter: blur(18px) saturate(1.4);
+  border-color: var(--border);
+}
+
+/* nav rail link */
+.nav-link {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  border-radius: 0.8rem;
+  padding: 0.6rem 0.8rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--ink-2);
+  transition: background 0.2s, color 0.2s;
+}
+.nav-link:hover { color: var(--ink); background: var(--surface); }
+.nav-link[data-active="true"] {
+  color: var(--ink);
+  background: color-mix(in srgb, var(--brand) 15%, transparent);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--brand) 22%, transparent);
+}
+
+/* collapsed icon-rail: center icons */
+@media (min-width: 1024px) {
+  aside[data-collapsed="true"] .nav-link {
+    justify-content: center;
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+    gap: 0;
+  }
+}
+
+/* live-feed row entrance: slide from top + brief highlight */
+@keyframes feed-in {
+  0% { opacity: 0; transform: translateY(-12px); background: color-mix(in srgb, var(--brand) 18%, transparent); }
+  55% { background: color-mix(in srgb, var(--brand) 14%, transparent); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+.feed-in { animation: feed-in 0.6s cubic-bezier(0.22, 0.8, 0.26, 1) both; }
+
+/* circular gauge arc — transition only, so it never restarts on re-render */
+.gauge-arc {
+  transition: stroke-dashoffset 0.9s cubic-bezier(0.22, 0.8, 0.26, 1), stroke 0.4s ease;
+}
+.gauge-pulse {
+  position: absolute;
+  inset: 7px;
+  border-radius: 50%;
+  pointer-events: none;
+  animation: gauge-pulse 2.4s ease-out infinite;
+}
+@keyframes gauge-pulse {
+  0% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--c) 26%, transparent); }
+  70%, 100% { box-shadow: 0 0 0 14px color-mix(in srgb, var(--c) 0%, transparent); }
+}
+
+/* chart tooltip fade + slight rise */
+@keyframes tip-in {
+  from { opacity: 0; transform: translate(-50%, 4px); }
+  to { opacity: 1; transform: translate(-50%, 0); }
+}
+.chart-tip { animation: tip-in 0.15s ease; }
+
+/* ticking colon in the clock */
+@keyframes blink { 50% { opacity: 0.25; } }
+.blink { animation: blink 1s step-end infinite; }
+
+/* thin sync-countdown bar */
+.sync-track { background: color-mix(in srgb, var(--brand) 16%, transparent); }
+.sync-fill {
+  background: linear-gradient(90deg, var(--brand), var(--brand-2));
+  transition: width 0.25s linear;
+  box-shadow: 0 0 8px var(--glow);
+}
+
+/* value flash when a live number changes */
+@keyframes value-flash {
+  0% { color: var(--brand-2); text-shadow: 0 0 14px var(--glow); }
+  100% { }
+}
+.value-flash { animation: value-flash 0.7s ease-out; }
+
+/* staggered children entrance — add .stagger to a container */
+.stagger > * { animation: rise-in 0.42s cubic-bezier(0.22, 0.8, 0.26, 1) both; }
+.stagger > *:nth-child(1) { animation-delay: 0.03s; }
+.stagger > *:nth-child(2) { animation-delay: 0.06s; }
+.stagger > *:nth-child(3) { animation-delay: 0.09s; }
+.stagger > *:nth-child(4) { animation-delay: 0.12s; }
+.stagger > *:nth-child(5) { animation-delay: 0.15s; }
+.stagger > *:nth-child(6) { animation-delay: 0.18s; }
+.stagger > *:nth-child(7) { animation-delay: 0.21s; }
+.stagger > *:nth-child(8) { animation-delay: 0.24s; }
+.stagger > *:nth-child(9) { animation-delay: 0.27s; }
+.stagger > *:nth-child(10) { animation-delay: 0.30s; }
+.stagger > *:nth-child(11) { animation-delay: 0.33s; }
+.stagger > *:nth-child(12) { animation-delay: 0.36s; }
+
+/* chart draw-in (runs once on mount; live updates only change path data) */
+@keyframes draw-line { from { stroke-dashoffset: 1; } to { stroke-dashoffset: 0; } }
+.chart-line { stroke-dasharray: 1; animation: draw-line 0.8s cubic-bezier(0.22, 0.8, 0.26, 1) both; }
+@keyframes chart-fade { from { opacity: 0; } to { opacity: 1; } }
+.chart-area { animation: chart-fade 0.9s ease both; }
+@keyframes bar-grow { from { transform: scaleY(0); } to { transform: scaleY(1); } }
+.bar-grow { transform-origin: bottom; animation: bar-grow 0.55s cubic-bezier(0.22, 0.8, 0.26, 1) both; }
+
+/* collapse padding transition on the rail links */
+.nav-link { transition: background 0.2s, color 0.2s, padding 0.22s cubic-bezier(0.2, 0.8, 0.2, 1); }
+.nav-link svg { transition: transform 0.2s; }
+.nav-link:hover svg { transform: scale(1.12); }
+
+/* icon-chip hover lift used on buttons/pills */
+.hover-lift { transition: transform 0.2s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.2s; }
+.hover-lift:hover { transform: translateY(-2px); }
+
+/* animated sheen sweeping across a surface — add .sheen */
+.sheen { position: relative; overflow: hidden; }
+.sheen::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(115deg, transparent 30%, color-mix(in srgb, var(--brand) 14%, transparent) 50%, transparent 70%);
+  transform: translateX(-120%);
+  animation: sheen 6s ease-in-out infinite;
+  pointer-events: none;
+}
+@keyframes sheen { 0%, 60% { transform: translateX(-120%); } 85%, 100% { transform: translateX(120%); } }
+
+/* soft ring ping for live map markers / badges */
+@keyframes ping-ring {
+  0% { transform: scale(0.8); opacity: 0.7; }
+  80%, 100% { transform: scale(2.2); opacity: 0; }
+}
+.ping-ring { animation: ping-ring 1.8s cubic-bezier(0, 0, 0.2, 1) infinite; }
+
+/* ---------------- trendy FX ---------------- */
+
+/* film-grain overlay for depth */
+.grain {
+  position: fixed;
+  inset: 0;
+  z-index: -5;
+  pointer-events: none;
+  opacity: 0.04;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.82' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* live ticker / marquee strip */
+.marquee { overflow: hidden; white-space: nowrap; }
+.marquee-track { display: inline-flex; animation: marquee 34s linear infinite; }
+.marquee:hover .marquee-track { animation-play-state: paused; }
+.marquee-row { display: inline-flex; gap: 2.5rem; padding: 0.4rem 1.25rem; }
+@keyframes marquee { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+
+/* ---------------- leaflet map ---------------- */
+.leaflet-container { background: var(--surface-solid); font: inherit; }
+.leaflet-control-attribution {
+  background: color-mix(in srgb, var(--surface-solid) 72%, transparent) !important;
+  color: var(--muted) !important;
+  backdrop-filter: blur(6px);
+  border-radius: 6px 0 0 0;
+  font-size: 0.6rem !important;
+}
+.leaflet-control-attribution a { color: var(--brand-2) !important; }
+.leaflet-bar a {
+  background: var(--surface-solid) !important;
+  color: var(--ink) !important;
+  border-color: var(--border) !important;
+}
+.leaflet-bar a:hover { background: var(--surface-2) !important; }
+.leaflet-tooltip {
+  background: var(--surface-solid);
+  color: var(--ink);
+  border: 1px solid var(--border);
+  border-radius: 0.55rem;
+  padding: 0.3rem 0.55rem;
+  font-weight: 600;
+  font-size: 0.72rem;
+  box-shadow: 0 10px 28px -14px rgba(0, 0, 0, 0.55);
+  transition: opacity 0.15s ease;
+}
+.leaflet-tooltip-top::before { border-top-color: var(--border); }
+
+/* map pin (divIcon) */
+.mp {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 50% 50% 50% 0;
+  transform: rotate(-45deg);
+  background: color-mix(in srgb, var(--c) 94%, transparent);
+  border: 2px solid var(--surface-solid);
+  box-shadow: 0 4px 10px -2px rgba(0, 0, 0, 0.5), 0 0 0 1px color-mix(in srgb, var(--c) 40%, transparent);
+  transition: transform 0.2s;
+}
+.mp span {
+  transform: rotate(45deg);
+  color: #fff;
+  font-weight: 800;
+  font-size: 0.64rem;
+  line-height: 1;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.45);
+}
+.mp:hover { transform: rotate(-45deg) scale(1.16); z-index: 10; }
+.mp-live { outline: 2px solid var(--brand); outline-offset: 2px; }
+.mp-full::before {
+  content: "";
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  animation: mp-pulse 1.8s ease-out infinite;
+}
+@keyframes mp-pulse {
+  0% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--c) 65%, transparent); }
+  70%, 100% { box-shadow: 0 0 0 13px color-mix(in srgb, var(--c) 0%, transparent); }
+}
+
+/* Respect reduced-motion for the heavy ambient motion only, so the
+   functional UI animations (ticker, pulses, transitions) still play. */
 @media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after { animation-duration: 0.001ms !important; animation-iteration-count: 1 !important; }
   .dust { display: none; }
+  .aurora-blob,
+  .grain { animation: none !important; }
+}
+
+/* ---- calm UI (user preference): content stays still; only the three.js
+   ambient layer, live-status pulses and hover/colour transitions animate ---- */
+.rise-in,
+.stagger > *,
+.feed-in,
+.value-flash,
+.chart-line,
+.chart-area,
+.bar-grow,
+.gauge-pulse,
+.gradient-text,
+.marquee-track,
+.aurora-blob {
+  animation: none !important;
+}
+.gauge-arc { transition: none !important; }
+.chart-line { stroke-dasharray: none !important; stroke-dashoffset: 0 !important; }
+.dust { display: none !important; }
+.card-hover:hover { transform: none !important; }
+.btn:hover,
+.btn:active { transform: none !important; }
+
+/* ---- garbage-collection cue (bin at 100%) ---- */
+.collect-strip {
+  position: relative;
+  height: 14px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--critical) 16%, transparent);
+}
+.collect-truck {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  font-size: 12px;
+  line-height: 1;
+  transform: translate(-130%, -50%);
+  animation: truck-drive 2.6s linear infinite;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.35));
+}
+@keyframes truck-drive {
+  0% { transform: translate(-130%, -50%); }
+  100% { transform: translate(calc(100% + 130%), -50%); }
+}
+.collect-chip {
+  animation: collect-flash 1.4s ease-in-out infinite;
+}
+@keyframes collect-flash {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .collect-truck, .collect-chip { animation: none !important; }
 }

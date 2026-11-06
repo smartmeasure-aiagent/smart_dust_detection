@@ -24,6 +24,10 @@ export type BinStatus = {
 
 export type Point = { ts: number; distance: number; fill: number };
 
+export type EventKind = "FULL_ALERT" | "RESET" | "SENSOR_FAULT" | "SENSOR_RECOVERED";
+
+export type EventItem = { ts: number; kind: EventKind | string; fill: number | null; detail: string };
+
 export type Stats = {
   total_readings: number;
   collections_today: number;
@@ -68,3 +72,16 @@ export const levelColor: Record<Level, string> = {
 
 export const formatTime = (ts: number) =>
   new Date(ts * 1000).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", second: "2-digit" });
+
+// Short relative time, e.g. "now", "8s", "3m", "2h". `nowMs` lets callers pass a
+// shared clock so many timestamps re-render in sync on each tick.
+export function timeAgo(tsSec: number, nowMs: number = Date.now()): string {
+  const s = Math.max(0, Math.round(nowMs / 1000 - tsSec));
+  if (s < 2) return "now";
+  if (s < 60) return `${s}s`;
+  const m = Math.floor(s / 60);
+  if (m < 60) return `${m}m`;
+  const h = Math.floor(m / 60);
+  if (h < 24) return `${h}h`;
+  return `${Math.floor(h / 24)}d`;
+}
